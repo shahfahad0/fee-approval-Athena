@@ -1,0 +1,10 @@
+.gradle/
+build/
+*/build/
+local.properties
+*.iml
+.idea/
+.DS_Store
+# Never commit server-side Firebase admin service-account keys
+*firebase-adminsdk*.json
+firebase-service-account.json
