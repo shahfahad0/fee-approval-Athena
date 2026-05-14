@@ -1,7 +1,7 @@
 workflows:
-  android-debug-apk:
+  build-fee-approval-apk:
     name: Build Fee Approval APK
-    instance_type: linux_x2
+    instance_type: mac_mini_m2
     max_build_duration: 60
 
     environment:
@@ -14,25 +14,26 @@ workflows:
           ls -la
           ls -la app || true
 
-      - name: Make Gradle wrapper executable
+      - name: Make Gradle executable
         script: |
           chmod +x ./gradlew || true
 
       - name: Build debug APK
         script: |
           if [ -f "./gradlew" ]; then
-            ./gradlew clean assembleDebug --stacktrace
+            ./gradlew :app:assembleDebug --stacktrace
           else
-            gradle clean assembleDebug --stacktrace
+            gradle :app:assembleDebug --stacktrace
           fi
 
-      - name: Copy APK to output folder
+      - name: Prepare APK artifact
         script: |
-          mkdir -p build-output
-          APK_PATH=$(find app/build/outputs/apk -name "*.apk" | head -n 1)
+          mkdir -p output
+          APK_PATH=$(find app/build/outputs/apk/debug -name "*.apk" | head -n 1)
           echo "APK found at: $APK_PATH"
-          cp "$APK_PATH" build-output/FeeApproval.apk
+          cp "$APK_PATH" output/FeeApproval.apk
 
     artifacts:
-      - build-output/FeeApproval.apk
+      - output/FeeApproval.apk
       - app/build/outputs/**/*.apk
+      - app/build/outputs/**/mapping.txt
