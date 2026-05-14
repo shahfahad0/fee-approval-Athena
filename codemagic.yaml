@@ -1,0 +1,38 @@
+workflows:
+  android-debug-apk:
+    name: Build Fee Approval APK
+    instance_type: linux_x2
+    max_build_duration: 60
+
+    environment:
+      java: 17
+
+    scripts:
+      - name: Show project files
+        script: |
+          pwd
+          ls -la
+          ls -la app || true
+
+      - name: Make Gradle wrapper executable
+        script: |
+          chmod +x ./gradlew || true
+
+      - name: Build debug APK
+        script: |
+          if [ -f "./gradlew" ]; then
+            ./gradlew clean assembleDebug --stacktrace
+          else
+            gradle clean assembleDebug --stacktrace
+          fi
+
+      - name: Copy APK to output folder
+        script: |
+          mkdir -p build-output
+          APK_PATH=$(find app/build/outputs/apk -name "*.apk" | head -n 1)
+          echo "APK found at: $APK_PATH"
+          cp "$APK_PATH" build-output/FeeApproval.apk
+
+    artifacts:
+      - build-output/FeeApproval.apk
+      - app/build/outputs/**/*.apk
